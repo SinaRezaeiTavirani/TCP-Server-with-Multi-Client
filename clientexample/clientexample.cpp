@@ -10,9 +10,20 @@ std::vector<char> get_vec(std::string info)
 	return std::vector<char>(info.begin(), info.end());
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-	std::shared_ptr<Client> client = std::make_shared<Client>("127.0.0.1", 8080);
+	std::string ip_address = "127.0.0.1";
+	unsigned short port = 8080;
+	if (argc != 3) {
+		std::cout << "using default config IP : 127.0.0.1 and Port 8080\n";
+	}
+	else
+	{
+		ip_address = argv[1];
+		port = std::stoul(argv[2]);
+	}
+
+	std::shared_ptr<Client> client = std::make_shared<Client>(ip_address, port);
 
 	bool key[2] = { false, false };
 	bool old_key[2] = { false, false };
@@ -20,12 +31,12 @@ int main()
 
 	while (!quit)
 	{
-		
+
 		key[0] = GetAsyncKeyState('2') & 0x8000;
 		key[1] = GetAsyncKeyState(VK_ESCAPE) & 0x8000;
-		
+
 		if (key[0] && !old_key[0]) client->send(get_vec("testing server\n"));
-		if (key[1] && !old_key[2]) quit = true;
+		if (key[1] && !old_key[1]) quit = true;
 
 		for (int i = 0; i < 2; i++) old_key[i] = key[i];
 	}

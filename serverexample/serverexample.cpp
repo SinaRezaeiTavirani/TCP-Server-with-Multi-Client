@@ -10,12 +10,18 @@ std::vector<char> get_vec(std::string info)
 	return std::vector<char>(info.begin(), info.end());
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-	std::shared_ptr<Server> server = std::make_shared<Server>(8080);
+	unsigned short port = 8080;
+	if (argc != 2)
+		std::cout << "using default config IP : 127.0.0.1 and Port 8080\n";
+	else
+		port = std::stoul(argv[1]);
 
-	bool key[2] = { false, false};
-	bool old_key[2] = { false, false};
+	std::shared_ptr<Server> server = std::make_shared<Server>(port);
+
+	bool key[2] = { false, false };
+	bool old_key[2] = { false, false };
 	bool quit = false;
 
 	while (!quit)
