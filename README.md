@@ -33,3 +33,7 @@ This repository contains a C++ implementation of a TCP server with multi-client 
    clientexample.exe 127.0.0.1 9000
 3. If you don't specify IP and Ports, it will run the defualts which is 127.0.0.1 with port 8080
 4. You can test server and client connection with '1' key and '2'
+
+## Demo
+
+![Demo GIF](media/00-server-client-demo.gif)
