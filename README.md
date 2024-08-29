@@ -6,6 +6,7 @@ This repository contains a C++ implementation of a TCP server with multi-client 
 - [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
+- [Run Program](#installation)
 
 ## Features
 - **Object-Oriented Design:** Modular code structure for better maintainability and scalability.
@@ -22,6 +23,13 @@ This repository contains a C++ implementation of a TCP server with multi-client 
    ```bash
    git clone https://github.com/SinaRezaeiTavirani/NetworkPractic.git
 2. Build the projects in visual studio (in the near future I will make a cmake so it would be much easier).
-3. first run the exampleserver.exe and then exampleclient.exe
-4. you can test server and client connection with '1' key and '2' 
-   
+3. To see colored output run EnableAnsiEscapeCodeSupport.reg
+
+### Run Program
+1. First run serverexample.exe and then clientexample.exe
+2. Give Port number for Server and for client, give IP and port number like this
+   ```bash
+   serverexample.exe 9000
+   clientexample.exe 127.0.0.1 9000
+3. If you don't specify IP and Ports, it will run the defualts which is 127.0.0.1 with port 8080
+4. You can test server and client connection with '1' key and '2'
