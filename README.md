@@ -4,20 +4,14 @@ This repository contains a C++ implementation of a TCP server with multi-client 
 
 ## Table of Contents
 - [Features](#features)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Usage](#usage)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
 
 ## Features
 - **Object-Oriented Design:** Modular code structure for better maintainability and scalability.
 - **Multi-Client Support:** Asynchronous I/O operations enable handling multiple clients concurrently.
 - **Boost Asio Integration:** Utilizes Boost Asio for robust networking and asynchronous communication.
 
-## Getting Started
 
 ### Prerequisites
 - **C++ Compiler:** A modern C++ compiler (C++11 or later).
