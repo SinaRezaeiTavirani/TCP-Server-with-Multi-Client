@@ -20,6 +20,10 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<Server> server = std::make_shared<Server>(port);
 
+	server->connect_on_data_received([](unsigned short clientId, const std::vector<char>& data, std::size_t length) {
+		std::cout << "Custom handler: Received data from client " << clientId << ": " << std::string(data.begin(), data.end()) << "\n";
+		});
+
 	bool key[2] = { false, false };
 	bool old_key[2] = { false, false };
 	bool quit = false;

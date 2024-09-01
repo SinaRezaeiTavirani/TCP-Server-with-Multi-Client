@@ -47,7 +47,7 @@ void Server::startListen() {
 					if (!error) {
 						std::cout << colors.green <<  "New client connected.\n" << colors.white;
 						ip_map_[id_] = socket_map[id_]->remote_endpoint().address().to_string();
-						handleClient(id_);
+						handle_client(id_);
 					}
 					else {
 						std::cerr << "Failed to accept connection: " << error.message() << "\n";
@@ -78,7 +78,7 @@ void Server::stop() {
 	}
 }
 
-void Server::handleClient(unsigned short clientId) {
+void Server::handle_client(unsigned short clientId) {
     
 
 	auto v_buffer = std::make_shared<std::vector<char>>(1024);
@@ -87,27 +87,31 @@ void Server::handleClient(unsigned short clientId) {
 	// Asynchronously read data from the socket
 	socket_map[clientId]->async_read_some(asio::buffer(v_buffer->data(), v_buffer->size()),
 		[this, v_buffer, clientId](const boost::system::error_code& error, std::size_t length) {
-			if (!error) 
-			{
-				std::cout << "Received data from ID :  " << colors.bright_cyan << clientId << colors.white << " " << std::string(v_buffer->data(), length) << "\n" << colors.white;
-				handleClient(clientId);
+			if (!error) {
+				on_data_received_signal_(clientId, *v_buffer, length); // Trigger the data received signal
+				handle_client(clientId); // Continue reading from the client
 			}
-			else if (error == asio::error::eof) 
-			{
-				std::cout << "Client ID " << colors.bright_cyan << clientId << colors.red << " disconnected (EOF).\n" << colors.white;
-				socket_map[clientId]->close();
-			}
-			else if (error == asio::error::connection_reset) 
-			{
-				std::cout << "Client ID " << colors.bright_cyan << clientId << colors.red  << " disconnected (connection reset).\n" << colors.white;
-				socket_map[clientId]->close();
-			}
-			else 
-			{
-				std::cerr << colors.red << "Failed to read payload: " << error.message() << "\n" << colors.white;
+			else {
+				handle_disconnection(clientId, error);
 			}
 		});
 
+}
+
+void Server::handle_disconnection(unsigned short clientId, const boost::system::error_code& error) {
+	if (error == boost::asio::error::eof) {
+		std::cout << "Client ID " << colors.bright_cyan << clientId << colors.red << " disconnected (EOF).\n" << colors.white;
+	}
+	else if (error == boost::asio::error::connection_reset) {
+		std::cout << "Client ID " << colors.bright_cyan << clientId << colors.red << " disconnected (connection reset).\n" << colors.white;
+	}
+	else {
+		std::cerr << colors.red << "Failed to read payload: " << error.message() << "\n" << colors.white;
+	}
+	// Close and remove the socket
+	socket_map[clientId]->close();
+	socket_map.erase(clientId);
+	ip_map_.erase(clientId);
 }
 
 std::unordered_map<short, std::string> Server::get_ip_map()
@@ -143,3 +147,7 @@ void Server::broad_cast(const std::vector<char>& data)
 }
 
 
+boost::signals2::connection Server::connect_on_data_received(std::function<void(unsigned short client_id, const std::vector<char>& data, const std::size_t length)> func)
+{
+	return on_data_received_signal_.connect(func);
+}
