@@ -43,20 +43,37 @@ void Client::connect()
 	socket_.async_connect(endpoint,
 		[this](boost::system::error_code ec) {
 			if (!ec) {
-				std::cout << "Connected to the server.\n";
+				std::cout << colors.green <<  "Connected to the server.\n" << colors.white;
 				receive_data();
 			}
 			else {
-				std::cerr << "Failed to connect: " << ec.message() << std::endl;
+				std::cerr << colors.red << "Failed to connect: " << ec.message() << colors.white << std::endl;
 				
 			}
 		});
 	
 }
+void Client::handle_disconnection(const boost::system::error_code& error) {
+	if (error == boost::asio::error::eof) {
+		std::cout << "Server " << colors.red << " disconnected (EOF).\n" << colors.white;
+	}
+	else if (error == boost::asio::error::connection_reset) {
+		std::cout << "Server " << colors.red << " disconnected (connection reset).\n" << colors.white;
+	}
+	else {
+		std::cerr << colors.red << "Failed to read payload: " << error.message() << "\n" << colors.white;
+	}
+	// Close and remove the socket
+	socket_.close();
+	
+	
+}
 
-bool Client::disconnect()
+
+
+boost::signals2::connection Client::connect_on_data_received(std::function<void(const std::vector<char>& data, const std::size_t length)> func)
 {
-	return false;
+	return on_data_received_signal_.connect(func);
 }
 
 void Client::receive_data()
@@ -69,22 +86,11 @@ void Client::receive_data()
 	socket_.async_read_some(asio::buffer(v_buffer->data(), v_buffer->size()),
 		[this, v_buffer](const boost::system::error_code& error, std::size_t length) {
 			if (!error) {
-				std::cout << "Received data from server " << std::string(v_buffer->data(), length) << "\n";
-				
+				on_data_received_signal_( *v_buffer, length); // Trigger the data received signal
 				receive_data();
 			}
-			else if (error == asio::error::eof) {
-				
-				std::cout << "server disconnected (EOF).\n";
-				socket_.close();
-			}
-			else if (error == asio::error::connection_reset) {
-				// The connection was forcibly closed
-				std::cout << "server disconnected (connection reset).\n";
-				socket_.close();
-			}
 			else {
-				std::cerr << "Failed to read payload: " << error.message() << "\n";
+				handle_disconnection( error);
 			}
 		});
 
