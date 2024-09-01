@@ -10,7 +10,7 @@
 #include <boost/asio.hpp>
 #include <boost/signals2.hpp>
 
-#include "common.h"
+#include "../common/common.h"
 
 class Server {
 public:
