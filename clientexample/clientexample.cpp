@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<Client> client = std::make_shared<Client>(ip_address, port);
 
-	client->connect_on_data_received([](const std::vector<char>& data, std::size_t length) {
+	client->set_data_receiver_handler_funtion([](const std::vector<char>& data, std::size_t length) {
 		std::cout << "Custom handler: Received data from Server : " << std::string(data.begin(), data.end()) << "\n";
 		});
 

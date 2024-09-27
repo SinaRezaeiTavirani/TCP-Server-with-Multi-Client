@@ -1,8 +1,6 @@
 #include "Server.h"
 
 
-#include <boost/exception/all.hpp>
-
 
 
 Server::Server( unsigned short port) : port_(port)
@@ -86,9 +84,15 @@ void Server::handle_client(unsigned short clientId) {
 	using namespace boost;
 	// Asynchronously read data from the socket
 	socket_map[clientId]->async_read_some(asio::buffer(v_buffer->data(), v_buffer->size()),
-		[this, v_buffer, clientId](const boost::system::error_code& error, std::size_t length) {
+		[this, v_buffer, clientId](const asio::error_code& error, std::size_t length) {
 			if (!error) {
-				on_data_received_signal_(clientId, *v_buffer, length); // Trigger the data received signal
+				try {
+					data_receiver_handler_(clientId, *v_buffer, length); // Trigger the data received signal
+				}
+				catch (std::exception& ex) {
+					std::cout << colors.red <<  "Exception in data receiver handler, maybe you didn't specify function handler for receiving data : " << ex.what() << "\n" << colors.white;
+				}
+					
 				handle_client(clientId); // Continue reading from the client
 			}
 			else {
@@ -98,11 +102,11 @@ void Server::handle_client(unsigned short clientId) {
 
 }
 
-void Server::handle_disconnection(unsigned short clientId, const boost::system::error_code& error) {
-	if (error == boost::asio::error::eof) {
+void Server::handle_disconnection(unsigned short clientId, const asio::error_code& error) {
+	if (error == asio::error::eof) {
 		std::cout << "Client ID " << colors.bright_cyan << clientId << colors.red << " disconnected (EOF).\n" << colors.white;
 	}
-	else if (error == boost::asio::error::connection_reset) {
+	else if (error == asio::error::connection_reset) {
 		std::cout << "Client ID " << colors.bright_cyan << clientId << colors.red << " disconnected (connection reset).\n" << colors.white;
 	}
 	else {
@@ -146,8 +150,9 @@ void Server::broad_cast(const std::vector<char>& data)
 	}
 }
 
-
-boost::signals2::connection Server::connect_on_data_received(std::function<void(unsigned short client_id, const std::vector<char>& data, const std::size_t length)> func)
+void Server::set_data_receiver_handler_funtion(std::function<void(const unsigned short client_id,const std::vector<char>& data, const std::size_t length)> data_receiver_handler)
 {
-	return on_data_received_signal_.connect(func);
+	data_receiver_handler_  = (data_receiver_handler);
 }
+
+

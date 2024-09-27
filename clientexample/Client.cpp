@@ -38,10 +38,10 @@ void Client::send(const std::vector<char>& data)
 
 void Client::connect()
 {
-	boost::system::error_code ec;
-	boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::make_address(server_ip_,ec), server_port_);
+	asio::error_code ec;
+	asio::ip::tcp::endpoint endpoint(asio::ip::make_address(server_ip_,ec), server_port_);
 	socket_.async_connect(endpoint,
-		[this](boost::system::error_code ec) {
+		[this](asio::error_code ec) {
 			if (!ec) {
 				std::cout << colors.green <<  "Connected to the server.\n" << colors.white;
 				receive_data();
@@ -53,11 +53,11 @@ void Client::connect()
 		});
 	
 }
-void Client::handle_disconnection(const boost::system::error_code& error) {
-	if (error == boost::asio::error::eof) {
+void Client::handle_disconnection(const asio::error_code& error) {
+	if (error == asio::error::eof) {
 		std::cout << "Server " << colors.red << " disconnected (EOF).\n" << colors.white;
 	}
-	else if (error == boost::asio::error::connection_reset) {
+	else if (error == asio::error::connection_reset) {
 		std::cout << "Server " << colors.red << " disconnected (connection reset).\n" << colors.white;
 	}
 	else {
@@ -71,10 +71,7 @@ void Client::handle_disconnection(const boost::system::error_code& error) {
 
 
 
-boost::signals2::connection Client::connect_on_data_received(std::function<void(const std::vector<char>& data, const std::size_t length)> func)
-{
-	return on_data_received_signal_.connect(func);
-}
+
 
 void Client::receive_data()
 {
@@ -84,9 +81,14 @@ void Client::receive_data()
 	using namespace boost;
 	// Asynchronously read data from the socket
 	socket_.async_read_some(asio::buffer(v_buffer->data(), v_buffer->size()),
-		[this, v_buffer](const boost::system::error_code& error, std::size_t length) {
+		[this, v_buffer](const asio::error_code& error, std::size_t length) {
 			if (!error) {
-				on_data_received_signal_( *v_buffer, length); // Trigger the data received signal
+				try {
+					data_receiver_handler_(*v_buffer, length); // Trigger the data received signal
+				}
+				catch (std::exception& ex) {
+					std::cout << colors.red << "Exception in data receiver handler, maybe you didn't specify function handler for receiving data : " << ex.what() << "\n" << colors.white;
+				}
 				receive_data();
 			}
 			else {
@@ -95,4 +97,8 @@ void Client::receive_data()
 		});
 
 
+}
+void Client::set_data_receiver_handler_funtion(std::function<void(const std::vector<char>& data, const std::size_t length)> data_receiver_handler)
+{
+	data_receiver_handler_ = (data_receiver_handler);
 }

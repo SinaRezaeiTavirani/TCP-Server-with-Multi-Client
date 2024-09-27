@@ -3,7 +3,6 @@
 
 #include "Server.h"
 
-using namespace boost;
 
 std::vector<char> get_vec(std::string info)
 {
@@ -20,7 +19,7 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<Server> server = std::make_shared<Server>(port);
 
-	server->connect_on_data_received([](unsigned short clientId, const std::vector<char>& data, std::size_t length) {
+	server->set_data_receiver_handler_funtion([](unsigned short clientId, const std::vector<char>& data, std::size_t length) {
 		std::cout << "Custom handler: Received data from client " << clientId << ": " << std::string(data.begin(), data.end()) << "\n";
 		});
 
