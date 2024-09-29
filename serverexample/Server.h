@@ -31,10 +31,12 @@ private:
 	void stop();
 	std::atomic<bool> running_;
 
+
 	void handle_client(unsigned short clientId);
 	void handle_disconnection(unsigned short clientId, const asio::error_code& error);
 	unsigned port_;
 	std::thread thread_worker_;
+	std::vector<std::thread> thread_pool_;
 
 	std::unordered_map<short, std::shared_ptr<asio::ip::tcp::socket> > socket_map;
 	std::unordered_map<short, std::string> ip_map_;

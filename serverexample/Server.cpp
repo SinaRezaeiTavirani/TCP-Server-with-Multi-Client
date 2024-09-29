@@ -3,7 +3,7 @@
 
 
 
-Server::Server( unsigned short port) : port_(port)
+Server::Server( unsigned short port) : port_(port), io_context_(std::thread::hardware_concurrency())
 {
 	running_ = true;
 	id_ = 1000;
@@ -14,6 +14,9 @@ Server::Server( unsigned short port) : port_(port)
 Server::~Server()
 {
 	stop();
+	for (auto& t : thread_pool_) {
+		t.join();
+	}
 	if (thread_worker_.joinable()) {
 		thread_worker_.join();
 	}
@@ -59,6 +62,12 @@ void Server::startListen() {
 		accept_handler();
 
 		// Run the I/O context to process asynchronous events
+		for (int i = 0; i < std::thread::hardware_concurrency(); i++)
+		{
+			thread_pool_.emplace_back([&, this] {
+				io_context_.run();
+				});
+		}
 		io_context_.run();
 	}
 

@@ -5,6 +5,7 @@
 #include "Client.h"
 
 
+
 std::vector<char> get_vec(std::string info)
 {
 	return std::vector<char>(info.begin(), info.end());
@@ -43,6 +44,7 @@ int main(int argc, char* argv[])
 		if (key[1] && !old_key[1]) quit = true;
 
 		for (int i = 0; i < 2; i++) old_key[i] = key[i];
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}
 
 	return 0;
