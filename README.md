@@ -1,6 +1,6 @@
-# TCP Server with Multi-Client Support using Boost Asio
+# TCP Server with Multi-Client Support using Asio
 
-This repository contains a C++ implementation of a TCP server with multi-client support, built using Boost Asio. The server is designed with an object-oriented approach, allowing it to handle multiple client connections concurrently.
+This repository contains a C++ implementation of a TCP server with multi-client support, built using Asio. The server is designed with an object-oriented approach, allowing it to handle multiple client connections concurrently.
 
 ## Table of Contents
 - [Features](#features)
@@ -11,19 +11,19 @@ This repository contains a C++ implementation of a TCP server with multi-client 
 ## Features
 - **Object-Oriented Design:** Modular code structure for better maintainability and scalability.
 - **Multi-Client Support:** Asynchronous I/O operations enable handling multiple clients concurrently.
-- **Boost Asio Integration:** Utilizes Boost Asio for robust networking and asynchronous communication.
+- **Asio Integration:** Utilizes Asio for robust networking and asynchronous communication.
 
 
 ### Prerequisites
 - **C++ Compiler:** A modern C++ compiler (C++11 or later).
-- **Boost Library:** Ensure that Boost Asio is installed on your system.
+- **Boost Library:** Ensure that Asio is installed on your system.
 
 ### Installation
 1. Clone the repository:
    ```bash
    git clone https://github.com/SinaRezaeiTavirani/NetworkPractic.git
 2. Build the projects in visual studio (in the near future I will make a cmake so it would be much easier).
-3. To see colored output run EnableAnsiEscapeCodeSupport.reg
+3. To see colored output in Windows run EnableAnsiEscapeCodeSupport.reg
 
 ### Run Program
 1. First run serverexample.exe and then clientexample.exe
